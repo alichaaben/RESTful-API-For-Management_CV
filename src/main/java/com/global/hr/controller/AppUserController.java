@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
@@ -30,6 +31,7 @@ public class AppUserController {
     private final AppUserService appUserService;
     private final AppUserMapper appUserMapper;
     private final RolesRepo rolesRepo;
+    private final PasswordEncoder passwordEncoder; 
     
 
 
@@ -66,17 +68,23 @@ public class AppUserController {
         Roles role = rolesRepo.findByRoleName(roleName)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
+        // Hachage du mot de passe avec BCrypt
+        String hashedPassword = passwordEncoder.encode(motDePasse);
+
         AppUser user = new AppUser();
         user.setUserName(userName);
         user.setEmail(email);
         user.setTelephone(telephone);
-        user.setMotDePasse(motDePasse);
+        user.setMotDePasse(hashedPassword);
         user.setRole(role);
 
         if (profileImage.isEmpty()) {
             throw new RuntimeException("Profile image is required");
         }
 
+        
+        
+        @SuppressWarnings("null")
         String imageName = StringUtils.cleanPath(profileImage.getOriginalFilename());
         String uploadDir = "/home/ali/Desktop/work/hr/ProfileImages/";
         File uploadDirFile = new File(uploadDir);
@@ -110,17 +118,20 @@ public class AppUserController {
         if (currentUser == null) {
             throw new ResourceNotFoundException("User not found with ID: " + id);
         }
-    
+        String currentImage = currentUser.getProfileImage();
+
         currentUser.setUserName(userName);
         currentUser.setEmail(email);
         currentUser.setTelephone(telephone);
-        currentUser.setMotDePasse(motDePasse);
-    
+        // Hachage du mot de passe avec BCrypt
+        String hashedPassword = passwordEncoder.encode(motDePasse);
+        currentUser.setMotDePasse(hashedPassword);
         Roles role = rolesRepo.findByRoleName(roleName)
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found with name: " + roleName));
         currentUser.setRole(role);
     
         if (profileImage != null && !profileImage.isEmpty()) {
+            @SuppressWarnings("null")
             String imageName = StringUtils.cleanPath(profileImage.getOriginalFilename());
             String uploadDir = "/home/ali/Desktop/work/hr/ProfileImages/";
             File uploadDirFile = new File(uploadDir);
@@ -133,6 +144,19 @@ public class AppUserController {
             profileImage.transferTo(new File(imagePath));
     
             currentUser.setProfileImage(imagePath);
+        }
+
+        if (currentImage != null && currentUser.getProfileImage()==currentImage) {
+            File imageFile = new File(currentImage);
+            if (imageFile.exists()) {
+                if (imageFile.delete()) {
+                    System.out.println("Image deleted successfully: ");
+                } else {
+                    System.out.println("Failed to delete image: ");
+                }
+            } else {
+                System.out.println("Image file not found: ");
+            }
         }
     
         AppUser updatedUser = appUserService.update(currentUser);
