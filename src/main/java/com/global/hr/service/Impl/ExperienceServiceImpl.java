@@ -3,6 +3,8 @@ package com.global.hr.service.Impl;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import com.global.hr.Exceptions.EntityNotFoundException;
+import com.global.hr.Exceptions.InvalidEntityException;
 
 import com.global.hr.entity.Experience;
 import com.global.hr.repository.ExperienceRepo;
@@ -18,7 +20,8 @@ public class ExperienceServiceImpl implements ExperienceService {
     
     @Override
     public Experience findById(Long id) {
-        return experienceRepo.findById(id).orElse(null);
+        return experienceRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Experience not found with ID: " + id));
     }
 
     @Override
@@ -27,10 +30,13 @@ public class ExperienceServiceImpl implements ExperienceService {
     }
 
     @Override
-    public Experience insert(Experience Entity) {
-        return experienceRepo.save(Entity);
+    public Experience insert(Experience entity) {
+        if (entity.getTitreExperience() == null || entity.getTitreExperience().isEmpty()) {
+            throw new InvalidEntityException("Experience title is required.");
+        }
+        return experienceRepo.save(entity);
     }
-
+    
     @Override
     public Experience update(Experience Entity) {
         Experience currentExperience = experienceRepo.findById(Entity.getId())

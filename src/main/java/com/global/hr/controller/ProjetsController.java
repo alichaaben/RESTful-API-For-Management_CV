@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.global.hr.Exceptions.ResourceNotFoundException;
 import com.global.hr.dto.ProjetsDto;
 import com.global.hr.entity.AppUser;
 import com.global.hr.entity.Projets;
@@ -49,7 +50,7 @@ public class ProjetsController {
     public ResponseEntity<ProjetsDto> insert(@RequestBody ProjetsDto dto) {
         AppUser manager = appUserRepo.findByUserName(dto.getUserName());
         if (manager == null) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("User not found with username: " + dto.getUserName());
         }
 
         Projets projet = projetsMapper.unMap(dto);

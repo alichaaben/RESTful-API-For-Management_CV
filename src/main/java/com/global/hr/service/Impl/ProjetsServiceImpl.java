@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import com.global.hr.entity.Projets;
 import com.global.hr.repository.ProjetsRepo;
 import com.global.hr.service.ProjetsService;
+import com.global.hr.Exceptions.EntityNotFoundException;
+import com.global.hr.Exceptions.InvalidEntityException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +20,8 @@ public class ProjetsServiceImpl implements ProjetsService{
     
     @Override
     public Projets findById(Long id) {
-        return projetsRepo.findById(id).orElse(null);
+        return projetsRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found with ID: " + id));
     }
 
     @Override
@@ -32,9 +35,13 @@ public class ProjetsServiceImpl implements ProjetsService{
     }
 
     @Override
-    public Projets insert(Projets Entity) {
-        return projetsRepo.save(Entity);
+    public Projets insert(Projets entity) {
+        if (entity.getNomProjet() == null || entity.getNomProjet().isEmpty()) {
+            throw new InvalidEntityException("Project name is required.");
+        }
+        return projetsRepo.save(entity);
     }
+
 
     @Override
     public Projets update(Projets Entity) {

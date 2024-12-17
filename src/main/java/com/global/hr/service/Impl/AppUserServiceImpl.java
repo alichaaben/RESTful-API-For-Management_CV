@@ -3,6 +3,8 @@ package com.global.hr.service.Impl;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import com.global.hr.Exceptions.EntityNotFoundException;
+import com.global.hr.Exceptions.InvalidEntityException;
 
 import com.global.hr.entity.AppUser;
 import com.global.hr.repository.AppUserRepo;
@@ -18,7 +20,8 @@ public class AppUserServiceImpl implements AppUserService{
 
     @Override
     public AppUser findById(Long id) {
-        return appUserRepo.findById(id).orElse(null);
+        return appUserRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
     }
 
     @Override
@@ -32,8 +35,11 @@ public class AppUserServiceImpl implements AppUserService{
     }
 
     @Override
-    public AppUser insert(AppUser Entity) {
-        return appUserRepo.save(Entity);
+    public AppUser insert(AppUser entity) {
+        if (entity.getUserName() == null || entity.getUserName().isEmpty()) {
+            throw new InvalidEntityException("Username cannot be empty.");
+        }
+        return appUserRepo.save(entity);
     }
 
     @Override

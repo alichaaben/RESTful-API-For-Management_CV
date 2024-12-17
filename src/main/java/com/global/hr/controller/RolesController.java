@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.global.hr.Exceptions.ResourceNotFoundException;
 import com.global.hr.dto.RolesDto;
 import com.global.hr.entity.Roles;
 import com.global.hr.mapper.RolesMapper;
@@ -41,7 +42,7 @@ public class RolesController {
     public ResponseEntity<RolesDto> insert(@RequestBody RolesDto dto) {
         Optional<Roles> existingRole = rolesService.findByRoleName(dto.getRoleName());
         if (existingRole.isPresent()) {
-            throw new IllegalArgumentException("Role already exists with name: " + dto.getRoleName());
+            throw new ResourceNotFoundException("Role already exists with name: " + dto.getRoleName());
         }
     
         Roles role = rolesMapper.unMap(dto);

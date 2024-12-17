@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import com.global.hr.Exceptions.EntityNotFoundException;
+import com.global.hr.Exceptions.InvalidEntityException;
 
 import com.global.hr.entity.Roles;
 import com.global.hr.repository.RolesRepo;
@@ -19,7 +21,7 @@ public class RolesServiceImpl implements RolesService{
     @Override
     public Roles findById(Long id) {
         return rolesRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Role not found with ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Role not found with ID: " + id));
     }
 
     @Override
@@ -34,8 +36,11 @@ public class RolesServiceImpl implements RolesService{
     }
 
     @Override
-    public Roles insert(Roles Entity) {
-        return rolesRepo.save(Entity);
+    public Roles insert(Roles entity) {
+        if (entity.getRoleName() == null || entity.getRoleName().isEmpty()) {
+            throw new InvalidEntityException("Role name cannot be empty.");
+        }
+        return rolesRepo.save(entity);
     }
 
     @Override

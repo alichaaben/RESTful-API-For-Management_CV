@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.global.hr.Exceptions.ResourceNotFoundException;
 import com.global.hr.dto.AfficterUserProjetDto;
 import com.global.hr.entity.AfficterUserProjet;
 import com.global.hr.entity.AppUser;
@@ -52,24 +53,24 @@ public class AfficterUserProjetController {
 
         AppUser user = appUserRepo.findByUserName(dto.getEmploye());
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new ResourceNotFoundException("Utilisateur non trouvé avec le nom: " + dto.getEmploye());
         }
 
-        Projets Projet = projetsRepo.findByNomProjet(dto.getProjet());
-        if (Projet == null) {
-            throw new RuntimeException("Projet not found");
+        Projets projet = projetsRepo.findByNomProjet(dto.getProjet());
+        if (projet == null) {
+            throw new ResourceNotFoundException("Projet non trouvé avec le nom: " + dto.getProjet());
         }
 
-        AfficterUserProjet AffProj = afficterUserProjetMapper.unMap(dto);
-        AffProj.setUser(user);
-        AffProj.setProjet(Projet);
-        
-        AfficterUserProjet entity = afficterUserProjetService.insert(AffProj);
-        AfficterUserProjetDto rdto = afficterUserProjetMapper.map(entity);
+        AfficterUserProjet affProj = afficterUserProjetMapper.unMap(dto);
+        affProj.setUser(user);
+        affProj.setProjet(projet);
 
+        AfficterUserProjet entity = afficterUserProjetService.insert(affProj);
+        AfficterUserProjetDto responseDto = afficterUserProjetMapper.map(entity);
 
-        return ResponseEntity.ok(rdto);
+        return ResponseEntity.ok(responseDto);
     }
+
 
     @PutMapping()
     public ResponseEntity<AfficterUserProjetDto> update(@RequestBody AfficterUserProjetDto dto) {

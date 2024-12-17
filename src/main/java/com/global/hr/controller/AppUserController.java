@@ -3,6 +3,8 @@ package com.global.hr.controller;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.global.hr.Exceptions.ResourceNotFoundException;
 import com.global.hr.dto.AppUserDto;
 import com.global.hr.entity.AppUser;
 import com.global.hr.entity.Roles;
@@ -46,7 +48,7 @@ public class AppUserController {
     public ResponseEntity<AppUserDto> insert(@RequestBody AppUserDto dto) {
         
         Roles role = rolesRepo.findByRoleName(dto.getRoleName())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with name: " + dto.getRoleName()));
 
         AppUser user = appUserMapper.unMap(dto);
         user.setRole(role);
@@ -60,11 +62,14 @@ public class AppUserController {
     @PutMapping()
     public ResponseEntity<AppUserDto> update(@RequestBody AppUserDto dto) {
         AppUser currentUser = appUserService.findById(dto.getId());
+        if (currentUser == null) {
+            throw new ResourceNotFoundException("User not found with ID: " + dto.getId());
+        }
 
         appUserMapper.updateEntityFromDto(currentUser, dto);
 
         Roles role = rolesRepo.findByRoleName(dto.getRoleName())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with name: " + dto.getRoleName()));
         currentUser.setRole(role);
 
         AppUser updatedUser = appUserService.update(currentUser);
