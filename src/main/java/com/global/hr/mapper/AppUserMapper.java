@@ -18,6 +18,7 @@ public interface AppUserMapper {
     @Mapping(source = "telephone", target = "telephone")
     @Mapping(source = "motDePasse", target = "motDePasse")
     @Mapping(source = "role.roleName", target = "roleName")
+    @Mapping(source = "profileImage", target = "profileImage")
     AppUserDto map(AppUser entity);
 
 
@@ -32,6 +33,7 @@ public interface AppUserMapper {
     @Mapping(source = "roleName", target = "role", ignore = true)
     @Mapping(target = "projets", ignore = true)
     @Mapping(target = "experiences", ignore = true)
+    @Mapping(source = "profileImage", target = "profileImage", ignore = true)
     AppUser unMap(AppUserDto dto);
 
     // Mapping AppUserDto -> User pour mise à jour
@@ -42,6 +44,7 @@ public interface AppUserMapper {
     @Mapping(source = "roleName", target = "role", ignore = true)
     @Mapping(target = "projets", ignore = true)
     @Mapping(target = "experiences", ignore = true)
+    @Mapping(source = "profileImage", target = "profileImage", ignore = true)
     void updateEntityFromDto(@MappingTarget AppUser entity, AppUserDto dto);
 
 

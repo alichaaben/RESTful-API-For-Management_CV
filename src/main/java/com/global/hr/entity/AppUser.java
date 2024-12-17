@@ -33,6 +33,7 @@ public class AppUser {
     private String email;
     private String telephone;
     private String motDePasse;
+    private String profileImage;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
