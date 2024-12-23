@@ -68,7 +68,7 @@ public Map<String, String> login(@RequestParam String userName, @RequestParam St
     // - "scope" : les rôles de l'utilisateur
     JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder()
         .issuedAt(instant)  // Date d'émission du jeton
-        .expiresAt(instant.plus(10, ChronoUnit.MINUTES))  // Date d'expiration du jeton (10 minutes après)
+        .expiresAt(instant.plus(2, ChronoUnit.MINUTES))  // Date d'expiration du jeton (2 minutes après)
         .subject(userName)  // L'utilisateur authentifié
         .claim("scope", scope)  // Les rôles de l'utilisateur (dans le champ "scope")
         .build();

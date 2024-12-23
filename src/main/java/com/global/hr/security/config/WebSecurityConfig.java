@@ -1,5 +1,7 @@
 package com.global.hr.security.config;
 
+import java.util.List;
+
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -25,27 +27,48 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
     @Value("${jwt.secret}")
     private String SecretKey;
+
+        //**** pour tester l'app avant d'ajouter la securiter avec (oauth2,spring securtiy)
+    // @Bean
+    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    //     http
+    //         .csrf(csrf -> csrf.disable()) // Désactive CSRF pour simplifier les tests
+    //         .authorizeHttpRequests(auth -> auth
+    //             .anyRequest().permitAll() // Permet toutes les requêtes sans authentification
+    //         )
+    //         .oauth2ResourceServer(oauth2 -> oauth2.disable()); // Désactive OAuth2 Resource Server
+
+    //     return http.build();
+    // }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             // Désactiver CSRF pour simplifier les tests via Postman
             .csrf(csrf -> csrf.disable())
+
+            .cors(Customizer.withDefaults())
             
             // Configuration des autorisations
             .authorizeHttpRequests(auth -> auth
                 // Accès libre pour le login
                 .requestMatchers("/auth/login/**").permitAll()
+                // Accès libre pour les images
+                .requestMatchers("/user/images/**").permitAll()
 
                 // Accès pour les projets
                 .requestMatchers(HttpMethod.GET, "/projets/**").hasAnyRole("Admin", "Manager")
@@ -83,6 +106,7 @@ public class WebSecurityConfig {
 
         return http.build();
     }
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         // Cette méthode retourne un encodeur de mot de passe BCrypt qui est utilisé pour hacher et vérifier les mots de passe de manière sécurisée
@@ -126,4 +150,20 @@ public class WebSecurityConfig {
         authenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter); // Le JwtAuthenticationConverter utilise le JwtGrantedAuthoritiesConverter pour gérer les rôles
         return authenticationConverter; // Ce convertisseur est utilisé pour appliquer les rôles à l'utilisateur authentifié
     }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource(){
+         CorsConfiguration corsConfiguration = new CorsConfiguration();
+         corsConfiguration.addAllowedOrigin("*");
+         corsConfiguration.addAllowedMethod("*");
+         corsConfiguration.addAllowedHeader("*");
+         //corsConfiguration.setExposedHeaders(List.of("x-auth-token"));
+         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+         source.registerCorsConfiguration("/**", corsConfiguration);
+         return source;
+    }
+
+
+
+
     }
