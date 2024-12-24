@@ -2,14 +2,13 @@ package com.global.hr.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +35,7 @@ public class AppUserController {
     private final RolesRepo rolesRepo;
     private final PasswordEncoder passwordEncoder;
 
+    //@PreAuthorize("hasAuthority('ROLE_Employe','ROLE_Admin')")
     @GetMapping("/{id}")
     public ResponseEntity<AppUserDto> findById(@PathVariable Long id) {
         AppUser entity = appUserService.findById(id);

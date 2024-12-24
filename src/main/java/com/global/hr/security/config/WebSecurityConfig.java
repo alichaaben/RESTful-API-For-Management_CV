@@ -1,7 +1,5 @@
 package com.global.hr.security.config;
 
-import java.util.List;
-
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +67,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/auth/login/**").permitAll()
                 // Accès libre pour les images
                 .requestMatchers("/user/images/**").permitAll()
+                .requestMatchers("/user/filtre/**").permitAll()
 
                 // Accès pour les projets
                 .requestMatchers(HttpMethod.GET, "/projets/**").hasAnyRole("Admin", "Manager")
